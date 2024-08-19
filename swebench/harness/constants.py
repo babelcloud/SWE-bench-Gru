@@ -6,7 +6,11 @@ from typing import TypedDict
 BASE_IMAGE_BUILD_DIR = Path("logs/build_images/base")
 ENV_IMAGE_BUILD_DIR = Path("logs/build_images/env")
 INSTANCE_IMAGE_BUILD_DIR = Path("logs/build_images/instances")
-RUN_EVALUATION_LOG_DIR = Path("logs/run_evaluation")
+
+# Gru-begin
+# RUN_EVALUATION_LOG_DIR = Path("logs/run_evaluation")
+RUN_EVALUATION_LOG_DIR = Path("gru-result/evalution")
+# Gru-end
 
 # Constants - Task Instance Class
 class SWEbenchInstance(TypedDict):

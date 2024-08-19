@@ -9,6 +9,7 @@ from argparse import ArgumentParser
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from tqdm import tqdm
+from datetime import datetime
 
 from swebench.harness.constants import (
     APPLY_PATCH_FAIL,
@@ -16,6 +17,7 @@ from swebench.harness.constants import (
     INSTANCE_IMAGE_BUILD_DIR,
     KEY_INSTANCE_ID,
     RUN_EVALUATION_LOG_DIR,
+    SWEbenchInstance,
 )
 from swebench.harness.docker_utils import (
     remove_image,
@@ -76,7 +78,12 @@ def run_instance(
     """
     # Set up logging directory
     instance_id = test_spec.instance_id
-    model_name_or_path = pred.get("model_name_or_path", "None").replace("/", "__")
+
+    # Gru-begin
+    # model_name_or_path = pred.get("model_name_or_path", "None").replace("/", "__")
+    model_name_or_path = "log"
+    # Gru-end
+
     log_dir = RUN_EVALUATION_LOG_DIR / run_id / model_name_or_path / instance_id
     log_dir.mkdir(parents=True, exist_ok=True)
 
@@ -407,7 +414,9 @@ def make_run_report(
         report_file = (
             RUN_EVALUATION_LOG_DIR
             / run_id
-            / prediction["model_name_or_path"].replace("/", "__")
+            # Gru-begin
+            / "log" # / prediction["model_name_or_path"].replace("/", "__")
+            # Gru-end
             / prediction[KEY_INSTANCE_ID]
             / "report.json"
         )
@@ -469,11 +478,14 @@ def make_run_report(
         "unremoved_images": list(sorted(unremoved_images)),
         "schema_version": 2,
     }
-    report_file = Path(
-        list(predictions.values())[0]["model_name_or_path"].replace("/", "__")
-        + f".{run_id}"
-        + ".json"
-    )
+    # Gru-begin
+    report_file = Path(f'report_{datetime.now().strftime("%H-%M-%S")}.json')
+    # report_file = Path(
+    #     list(predictions.values())[0]["model_name_or_path"].replace("/", "__")
+    #     + f".{run_id}"
+    #     + ".json"
+    # )
+    # Gru-end
     with open(report_file, "w") as f:
         print(json.dumps(report, indent=4), file=f)
     print(f"Report written to {report_file}")
@@ -506,6 +518,9 @@ def main(
         open_file_limit: int,
         run_id: str,
         timeout: int,
+        # Gru-begin
+        test_instances: list[SWEbenchInstance] = []
+        # Gru-end
     ):
     """
     Run evaluation harness for the given dataset and predictions.
@@ -531,8 +546,15 @@ def main(
     predictions = {pred[KEY_INSTANCE_ID]: pred for pred in predictions}
 
     # get dataset from predictions
-    dataset = get_dataset_from_preds(dataset_name, split, instance_ids, predictions, run_id)
-    full_dataset = load_swebench_dataset(dataset_name, split)
+    # Gru-begin
+    if len(test_instances) > 0:
+        dataset = test_instances
+        full_dataset = test_instances
+    else:
+    # Gru-end
+        dataset = get_dataset_from_preds(dataset_name, split, instance_ids, predictions, run_id)
+        full_dataset = load_swebench_dataset(dataset_name, split)
+    
     existing_images = list_images(client)
     print(f"Running {len(dataset)} unevaluated instances...")
     if not dataset:

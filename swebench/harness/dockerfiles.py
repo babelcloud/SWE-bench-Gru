@@ -6,6 +6,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 
 RUN apt update && apt install -y \
+--fix-missing \
 wget \
 git \
 build-essential \
@@ -20,6 +21,10 @@ locales \
 locales-all \
 tzdata \
 && rm -rf /var/lib/apt/lists/*
+
+# Gru-end
+# + --fix-missing
+# Gru-end
 
 # Download and install conda
 RUN wget 'https://repo.anaconda.com/miniconda/Miniconda3-py311_23.11.0-2-Linux-{conda_arch}.sh' -O miniconda.sh \
