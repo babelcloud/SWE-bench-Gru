@@ -1,3 +1,8 @@
+# Gru
+gru-result/
+gru/dataset/cache/
+gru/dataset/swe-bench/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
