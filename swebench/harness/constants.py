@@ -44,6 +44,7 @@ class TestStatus(Enum):
     PASSED = "PASSED"
     SKIPPED = "SKIPPED"
     ERROR = "ERROR"
+    XFAIL = "XFAIL"
 
 TEST_PYTEST = "pytest --no-header -rA --tb=no -p no:cacheprovider"
 TEST_PYTEST_VERBOSE = "pytest -rA --tb=long -p no:cacheprovider"
@@ -79,12 +80,12 @@ SPECS_SKLEARN.update(
     {
         k: {
             "python": "3.9",
-            "packages": "numpy scipy cython setuptools pytest pandas matplotlib joblib threadpoolctl",
+            "packages": "'numpy==1.19.2' 'scipy==1.5.2' 'cython==3.0.10' pytest 'pandas<2.0.0' 'matplotlib<3.9.0' setuptools pytest joblib threadpoolctl",
             "install": "python -m pip install -v --no-use-pep517 --no-build-isolation -e .",
             "pip_packages": ["cython", "setuptools", "numpy", "scipy"],
             "test_cmd": TEST_PYTEST,
         }
-        for k in ["1.3", "1.4"]
+        for k in ["1.3", "1.4", "1.5", "1.6"]
     }
 )
 
@@ -132,7 +133,7 @@ SPECS_FLASK.update(
             ],
             "test_cmd": TEST_PYTEST,
         }
-        for k in ["2.2", "2.3"]
+        for k in ["2.2", "2.3", "3.0", "3.1"]
     }
 )
 
@@ -214,7 +215,7 @@ SPECS_DJANGO.update(
             "install": "python -m pip install -e .",
             "test_cmd": TEST_DJANGO,
         }
-        for k in ["5.0"]
+        for k in ["5.0", "5.1", "5.2"]
     }
 )
 SPECS_DJANGO['1.9']['test_cmd'] = TEST_DJANGO_NO_PARALLEL
@@ -228,7 +229,7 @@ SPECS_REQUESTS = {
     }
     for k in ["0.7", "0.8", "0.9", "0.11", "0.13", "0.14", "1.1", "1.2", "2.0", "2.2"]
     + ["2.3", "2.4", "2.5", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.17"]
-    + ["2.18", "2.19", "2.22", "2.26", "2.25", "2.27", "3.0"]
+    + ["2.18", "2.19", "2.22", "2.26", "2.25", "2.27", "2.31", "3.0"]
 }
 
 SPECS_SEABORN = {
@@ -286,7 +287,7 @@ SPECS_SEABORN.update(
             ],
             "test_cmd": TEST_SEABORN,
         }
-        for k in ["0.12", "0.13"]
+        for k in ["0.12", "0.13", "0.14"]
     }
 )
 
@@ -313,6 +314,10 @@ SPECS_PYTEST = {
         "7.2",
         "7.4",
         "8.0",
+        "8.1",
+        "8.2",
+        "8.3",
+        "8.4"
     ]
 }
 SPECS_PYTEST["4.4"]["pip_packages"] = [
@@ -403,20 +408,14 @@ for k in ["7.1", "7.2"]:
         "py==1.11.0",
         "tomli==2.0.1",
     ]
-SPECS_PYTEST["7.4"]["pip_packages"] = [
-    "iniconfig==2.0.0",
-    "packaging==23.1",
-    "pluggy==1.3.0",
-    "exceptiongroup==1.1.3",
-    "tomli==2.0.1",
-]
-SPECS_PYTEST["8.0"]["pip_packages"] = [
-    "iniconfig==2.0.0",
-    "packaging==23.1",
-    "pluggy==1.3.0",
-    "exceptiongroup==1.1.3",
-    "tomli==2.0.1",
-]
+for k in ["7.4", "8.0", "8.1", "8.2", "8.3", "8.4"]:
+    SPECS_PYTEST[k]["pip_packages"] = [
+        "iniconfig==2.0.0",
+        "packaging==23.1",
+        "pluggy==1.3.0",
+        "exceptiongroup==1.1.3",
+        "tomli==2.0.1",
+    ]
 
 SPECS_MATPLOTLIB = {
     k: {
@@ -424,7 +423,7 @@ SPECS_MATPLOTLIB = {
         "packages": "environment.yml",
         "install": "python -m pip install -e .",
         "pre_install": [
-            "apt-get -y update && apt-get -y upgrade && apt-get install -y imagemagick ffmpeg texlive texlive-latex-extra texlive-fonts-recommended texlive-xetex texlive-luatex cm-super dvipng"
+            "apt-get -y update && apt-get -y upgrade && DEBIAN_FRONTEND=noninteractive apt-get install -y imagemagick ffmpeg texlive texlive-latex-extra texlive-fonts-recommended texlive-xetex texlive-luatex cm-super dvipng"
         ],
         "pip_packages": [
             "contourpy==1.1.0",
@@ -445,7 +444,7 @@ SPECS_MATPLOTLIB = {
         ],
         "test_cmd": TEST_PYTEST,
     }
-    for k in ["3.5", "3.6", "3.7"]
+    for k in ["3.5", "3.6", "3.7", "3.8", "3.9"]
 }
 SPECS_MATPLOTLIB.update(
     {
@@ -454,7 +453,7 @@ SPECS_MATPLOTLIB.update(
             "packages": "requirements.txt",
             "install": "python -m pip install -e .",
             "pre_install": [
-                "apt-get -y update && apt-get -y upgrade && apt-get install -y imagemagick ffmpeg libfreetype6-dev pkg-config texlive texlive-latex-extra texlive-fonts-recommended texlive-xetex texlive-luatex cm-super"
+                "apt-get -y update && apt-get -y upgrade && DEBIAN_FRONTEND=noninteractive apt-get install -y imagemagick ffmpeg libfreetype6-dev pkg-config texlive texlive-latex-extra texlive-fonts-recommended texlive-xetex texlive-luatex cm-super"
             ],
             "pip_packages": ["pytest", "ipython"],
             "test_cmd": TEST_PYTEST,
@@ -492,6 +491,8 @@ SPECS_MATPLOTLIB.update(
         for k in ["2.0", "2.1", "2.2", "1.0", "1.1", "1.2", "1.3", "1.4", "1.5"]
     }
 )
+for k in ['3.8', '3.9']:
+    SPECS_MATPLOTLIB[k]["install"] = 'python -m pip install --no-build-isolation -e ".[dev]"'
 
 SPECS_SPHINX = {
     k: {
@@ -504,6 +505,7 @@ SPECS_SPHINX = {
     for k in ["1.5", "1.6", "1.7", "1.8", "2.0", "2.1", "2.2", "2.3", "2.4", "3.0"]
     + ["3.1", "3.2", "3.3", "3.4", "3.5", "4.0", "4.1", "4.2", "4.3", "4.4"]
     + ["4.5", "5.0", "5.1", "5.2", "5.3", "6.0", "6.2", "7.0", "7.1", "7.2"]
+    + ["7.3", "7.4", "8.0", "8.1"]
 }
 for k in ["3.0", "3.1", "3.2", "3.3", "3.4", "3.5", "4.0", "4.1", "4.2", "4.3", "4.4"]:
     SPECS_SPHINX[k][
@@ -539,9 +541,12 @@ for k in ["3.0", "3.1", "3.2", "3.3", "3.4", "3.5", "4.0", "4.1", "4.2", "4.3", 
             "sed -i 's/sphinxcontrib-htmlhelp/sphinxcontrib-htmlhelp<=2.0.4/' setup.py",
             "sed -i 's/sphinxcontrib-serializinghtml/sphinxcontrib-serializinghtml<=1.1.9/' setup.py",
         ])
-SPECS_SPHINX["7.2"]["pre_install"] += [
-    "apt-get update && apt-get install -y graphviz"
-]
+for k in ["7.2", "7.3", "7.4", "8.0", "8.1"]:
+    SPECS_SPHINX[k]["pre_install"] += [
+        "apt-get update && apt-get install -y graphviz"
+    ]
+for k in ["8.0", "8.1"]:
+    SPECS_SPHINX[k]["python"] = "3.10"
 
 SPECS_ASTROPY = {
     k: {
@@ -576,9 +581,8 @@ SPECS_ASTROPY = {
         ],
         "test_cmd": TEST_PYTEST,
     }
-    for k in ["3.0", "3.1", "3.2", "4.1", "4.2", "4.3", "5.0", "5.1", "5.2"]
+    for k in ["3.0", "3.1", "3.2", "4.1", "4.2", "4.3", "5.0", "5.1", "5.2", "v5.3"]
 }
-
 SPECS_ASTROPY.update(
     {
         k:  {
@@ -619,11 +623,12 @@ SPECS_ASTROPY.update(
         for k in ["0.1", "0.2", "0.3", "0.4", "1.1", "1.2", "1.3"]
     }
 )
-
-for k in ["4.1", "4.2", "4.3", "5.0", "5.1", "5.2"]:
+for k in ["4.1", "4.2", "4.3", "5.0", "5.1", "5.2", "v5.3"]:
     SPECS_ASTROPY[k]["pre_install"] = [
         'sed -i \'s/requires = \\["setuptools",/requires = \\["setuptools==68.0.0",/\' pyproject.toml'
     ]
+for k in ["v5.3"]:
+    SPECS_ASTROPY[k]["python"] = "3.10"
 
 SPECS_SYMPY = {
     k: {
@@ -634,7 +639,7 @@ SPECS_SYMPY = {
         "test_cmd": TEST_SYMPY,
     }
     for k in ["0.7", "1.0", "1.1", "1.10", "1.11", "1.12", "1.2", "1.4", "1.5", "1.6"]
-    + ["1.7", "1.8", "1.9"]
+    + ["1.7", "1.8", "1.9"] + ["1.10", "1.11", "1.12", "1.13", "1.14"]
 }
 SPECS_SYMPY.update(
     {
@@ -645,7 +650,7 @@ SPECS_SYMPY.update(
             "pip_packages": ["mpmath==1.3.0"],
             "test_cmd": TEST_SYMPY,
         }
-        for k in ["1.13"]
+        for k in ["1.13", "1.14"]
     }
 )
 
@@ -667,6 +672,10 @@ SPECS_PYLINT = {
         "2.8",
         "2.9",
         "3.0",
+        "3.1",
+        "3.2",
+        "3.3",
+        "4.0",
     ]
 }
 SPECS_PYLINT["2.8"]["pip_packages"] = ["pyenchant==3.2"]
@@ -679,10 +688,10 @@ SPECS_PYLINT.update(
             **SPECS_PYLINT[k],
             "pip_packages": ["astroid==3.0.0a6", "setuptools"],
         }
-        for k in ["3.0"]
+        for k in ["3.0", "3.1", "3.2", "3.3", "4.0"]
     }
 )
-for v in ["2.14", "2.15", "2.17", "3.0"]:
+for v in ["2.14", "2.15", "2.17", "3.0", "3.1", "3.2", "3.3", "4.0"]:
     SPECS_PYLINT[v]["nano_cpus"] = int(2e9)
 
 SPECS_XARRAY = {
@@ -705,7 +714,7 @@ SPECS_XARRAY = {
         "no_use_env": True,
         "test_cmd": TEST_PYTEST,
     }
-    for k in ["0.12", "0.18", "0.19", "0.20", "2022.03", "2022.06", "2022.09"]
+    for k in ["0.12", "0.18", "0.19", "0.20", "2022.03", "2022.06", "2022.09", "2023.07", "2024.05"]
 }
 
 SPECS_SQLFLUFF = {
@@ -943,7 +952,7 @@ MAP_REPO_TO_REQS_PATHS = {
     "pylint-dev/pylint": ["requirements_test.txt"],
     "pyvista/pyvista": ["requirements_test.txt", "requirements.txt"],
     "sqlfluff/sqlfluff": ["requirements_dev.txt"],
-    "sympy/sympy": ["requirements-dev.txt"],
+    "sympy/sympy": ["requirements-dev.txt", "requirements-test.txt"],
 }
 
 
