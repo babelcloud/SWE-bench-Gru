@@ -41,7 +41,7 @@ def main(mode: int, disable_cache: int, max_workers: int):
     # ================================================ #
     #               RUN EVALUATION                     #
     # ================================================ #
-    write_predictions(filtered_instance_ids, filtered_patch_files, timestamp, temp=True)
+    write_predictions(filtered_instance_ids, filtered_patch_files, timestamp)
     instances = get_instance(DATASET_NAME, filtered_instance_ids)
     write_test_instances(instances, timestamp)
 
@@ -52,9 +52,10 @@ def main(mode: int, disable_cache: int, max_workers: int):
     n = len(instances)
     for i in range(0, n, max_workers):
         print("=" * 50)
-        if max_workers > 1:
+        upper_bound = min(i + max_workers, n)
+        if max_workers > 1 and (upper_bound != i + 1):
             print(
-                f"  🔥 Running evaluation for instances {i+1} to {min(i + max_workers + 1, n)}"
+                f"  🔥 Running evaluation for instances {i+1} to {min(i + max_workers, n)}"
             )
         else:
             print(f"  🔥 Running evaluation instance {i+1}")

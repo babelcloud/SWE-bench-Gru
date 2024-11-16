@@ -73,12 +73,12 @@ def get_instance(dataset_name: str, instance_ids: list[str]) -> list[SWEbenchIns
         # Save the dataset to a local directory
         dataset.save_to_disk(local_path)
 
-    datset = [cast(SWEbenchInstance, instance) for instance in dataset]
+    dataset = [cast(SWEbenchInstance, instance) for instance in dataset]
+    datamap = {ins["instance_id"]: ins for ins in dataset}
 
     instances = []
-    for instance in datset:
-        if instance["instance_id"] in instance_ids:
-            instances.append(instance)
+    for instance_id in instance_ids:
+        instances.append(datamap[instance_id])
 
     return instances
 
