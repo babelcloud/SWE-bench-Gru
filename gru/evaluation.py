@@ -41,7 +41,7 @@ def main(mode: int, disable_cache: int, max_workers: int):
     # ================================================ #
     #               RUN EVALUATION                     #
     # ================================================ #
-    write_predictions(filtered_instance_ids, filtered_patch_files, timestamp)
+    write_predictions(filtered_instance_ids, filtered_patch_files, timestamp, temp=True)
     instances = get_instance(DATASET_NAME, filtered_instance_ids)
     write_test_instances(instances, timestamp)
 
