@@ -95,3 +95,10 @@ All of the evaluation results will be saved in the `history/` directory. Organiz
 -   `test-instances.json`: contains the test instances
 
 -   `log/`: contains the log file of the evaluation, includes some details of the evaluation process, organized by instance id
+
+# Sync with SWE-bench Official Code
+
+1. Switch to `SWE-bench-official` branch, click `Sync fork` button on the upper-right corner
+2. Rebase updates from `SWE-bench-official` branch to `main` branch
+
+
