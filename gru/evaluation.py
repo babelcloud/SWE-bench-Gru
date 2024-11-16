@@ -6,8 +6,11 @@ from gru.utils.evaluation_utils import (
     write_test_instances,
     write_predictions,
 )
+from gru.utils.constants import SWE_BENCH_RESULT_PATH
 from datetime import datetime
 from argparse import ArgumentParser
+import json
+import shutil
 
 from swebench.harness.run_evaluation import main as run_evaluation
 
@@ -22,7 +25,6 @@ def main(mode: int, disable_cache: int, max_workers: int):
     max_workers, instance_ids, patch_files = handle_parameters(
         mode, disable_cache, max_workers
     )
-    max_workers = 1
 
     # Handle cache
     timestamp = datetime.now().strftime("%m-%d-%H-%M-%S")
@@ -47,10 +49,17 @@ def main(mode: int, disable_cache: int, max_workers: int):
     print("=" * 50)
     print()
 
-    for i in range(0, len(instances), max_workers):
-        print(
-            f"🔥 Running evaluation for instances {i + 1} to {i + max_workers - 1}\n\n"
-        )
+    n = len(instances)
+    for i in range(0, n, max_workers):
+        print("=" * 50)
+        if max_workers > 1:
+            print(
+                f"  🔥 Running evaluation for instances {i+1} to {min(i + max_workers + 1, n)}"
+            )
+        else:
+            print(f"  🔥 Running evaluation instance {i+1}")
+        print("=" * 50 + "\n")
+
         instance_ids_batch = filtered_instance_ids[i : i + max_workers]
         patch_files_batch = filtered_patch_files[i : i + max_workers]
         instances_batch = instances[i : i + max_workers]
@@ -82,17 +91,33 @@ def main(mode: int, disable_cache: int, max_workers: int):
                 timestamp,
                 instance_ids_batch,
                 patch_files_batch,
-                only_print_res=True,
+                only_print_res=False,
             )
             # combine reports
             update_report(timestamp)
 
     # Remove temp files
+    temp_folder = SWE_BENCH_RESULT_PATH / timestamp / "temp"
+    if temp_folder.exists():
+        shutil.rmtree(temp_folder)
+
+    # Output combined result
+    with open(SWE_BENCH_RESULT_PATH / timestamp / "report.json", "r") as f:
+        report_data = json.load(f)
+
     print()
     print("=" * 50)
     print(" " * 12, "🎉 Evaluation completed 🎉")
-    print(f"\n📃 Report: gru-result/evalution/{timestamp}/Report.json\n")
+    print(f"📃 Report: gru-result/evalution/{timestamp}/report.json")
     print("=" * 50)
+
+    print(f"Total instances: {report_data.get('total_instances', 0)}")
+    print(f"Instances completed: {report_data.get('completed_instances', 0)}")
+    print(f"Instances incomplete: {len(report_data.get('incomplete_ids', []))}")
+    print(f"Instances resolved: {report_data.get('resolved_instances', 0)}")
+    print(f"Instances unresolved: {report_data.get('unresolved_instances', 0)}")
+    print(f"Instances with errors: {len(report_data.get('error_ids', []))}")
+    print()
 
 
 if __name__ == "__main__":

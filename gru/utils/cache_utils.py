@@ -109,15 +109,15 @@ class CacheManager:
         timestamp: str,
         instance_ids: list[str],
         filtered_patch_files: list[str],
-        only_print_res: bool = True,
+        only_print_res: bool = False,
     ):
         INSTANCE_FOLDER = RESULTS_FOLDER / timestamp / "log"
         if len(instance_ids) == 0:
             return
         print("\n")
-        print("=" * 50)
+        print("-" * 50)
         print("\t\tEvaluation Results")
-        print("=" * 50, "\n")
+        print("-" * 50, "\n")
 
         for instance_id, patch in zip(instance_ids, filtered_patch_files):
             instance_report = INSTANCE_FOLDER / instance_id / "report.json"
@@ -146,6 +146,7 @@ class CacheManager:
                     self.print_instance_result(instance_id, key, cached=False)
         if only_print_res is False:
             self.save_cache()
+        print("\n")
 
     def get_pass_info(self, result: dict) -> tuple[str, str]:
         pass_to_pass = result.get("tests_status", {}).get("PASS_TO_PASS")

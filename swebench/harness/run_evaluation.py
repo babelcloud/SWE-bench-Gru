@@ -435,17 +435,19 @@ def make_run_report(
             unstopped_containers.add(container.name)
 
     # print final report
-    dataset_ids = {i[KEY_INSTANCE_ID] for i in full_dataset}
-    print(f"Total instances: {len(full_dataset)}")
-    print(f"Instances submitted: {len(set(predictions.keys()) & dataset_ids)}")
-    print(f"Instances completed: {len(completed_ids)}")
-    print(f"Instances incomplete: {len(incomplete_ids)}")
-    print(f"Instances resolved: {len(resolved_ids)}")
-    print(f"Instances unresolved: {len(unresolved_ids)}")
-    print(f"Instances with empty patches: {len(empty_patch_ids)}")
-    print(f"Instances with errors: {len(error_ids)}")
-    print(f"Unstopped containers: {len(unstopped_containers)}")
-    print(f"Unremoved images: {len(unremoved_images)}")
+    # Gru-begin
+    # dataset_ids = {i[KEY_INSTANCE_ID] for i in full_dataset}
+    # print(f"Total instances: {len(full_dataset)}")
+    # print(f"Instances submitted: {len(set(predictions.keys()) & dataset_ids)}")
+    # print(f"Instances completed: {len(completed_ids)}")
+    # print(f"Instances incomplete: {len(incomplete_ids)}")
+    # print(f"Instances resolved: {len(resolved_ids)}")
+    # print(f"Instances unresolved: {len(unresolved_ids)}")
+    # print(f"Instances with empty patches: {len(empty_patch_ids)}")
+    # print(f"Instances with errors: {len(error_ids)}")
+    # print(f"Unstopped containers: {len(unstopped_containers)}")
+    # print(f"Unremoved images: {len(unremoved_images)}")
+    # Gru-end
 
     # write report to file
     report = {
@@ -469,7 +471,8 @@ def make_run_report(
         "schema_version": 2,
     }
     # Gru-begin
-    report_file = Path(f'report_{datetime.now().strftime("%H-%M-%S")}.json')
+    report_file = RUN_EVALUATION_LOG_DIR / run_id / "temp" / Path(f'report_{datetime.now().strftime("%H-%M-%S")}.json')
+    report_file.parent.mkdir(parents=True, exist_ok=True)
     # report_file = Path(
     #     list(predictions.values())[0]["model_name_or_path"].replace("/", "__")
     #     + f".{run_id}"

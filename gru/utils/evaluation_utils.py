@@ -37,7 +37,7 @@ def handle_parameters(
     # ================= Handle patch input =================
     match mode:
         case 0:
-            file_path = "/Users/huihwoo/Documents/Babel/SWE-bench-Analysis/SWE-bench/history/08-12-00-36-32/predictions.json"  # input("Enter the path of the json file (url or local path): \n")
+            file_path = input("Enter the path of the json file (url or local path): \n")
             instance_ids, patch_files = parse_json(file_path)
         case 1:
             # get instance ids for input, separated by space
@@ -240,7 +240,7 @@ def combine_reports(
             )
         )
 
-        report1["total_instances"] = len(report1["submitted_instances"])
+        report1["total_instances"] = len(report1["submitted_ids"])
         report1["submitted_instances"] = len(report1["submitted_ids"])
         report1["completed_instances"] = len(report1["completed_ids"])
         report1["resolved_instances"] = len(report1["resolved_ids"])
@@ -281,7 +281,7 @@ def update_report(timestamp: str):
     else:
         final_report = None
 
-    all_files = list(foler_path.glob("*"))
+    all_files = list((foler_path / "temp").glob("*"))
     for file in all_files:
         if (
             file.is_file()
@@ -291,6 +291,7 @@ def update_report(timestamp: str):
             with open(file, "r") as f:
                 json_file: ReportInsatnce = json.load(f)
                 final_report = combine_reports(json_file, final_report)
+                file.unlink()
 
     with open(report_path, "w") as f:
         json.dump(final_report, f, indent=4)
