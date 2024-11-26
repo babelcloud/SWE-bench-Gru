@@ -9,7 +9,7 @@ INSTANCE_IMAGE_BUILD_DIR = Path("logs/build_images/instances")
 
 # Gru-begin
 # RUN_EVALUATION_LOG_DIR = Path("logs/run_evaluation")
-RUN_EVALUATION_LOG_DIR = Path("gru-result/evalution")
+RUN_EVALUATION_LOG_DIR = Path("gru-result/evaluation")
 # Gru-end
 
 # Constants - Task Instance Class

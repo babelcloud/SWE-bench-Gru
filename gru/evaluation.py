@@ -20,10 +20,10 @@ DATASET_NAME = "SWE-bench"  # "SWE-bench_Lite"
 
 
 # ================= Main Functions =================
-def main(mode: int, disable_cache: int, max_workers: int):
+def main(mode: int, disable_cache: int, max_workers: int, enable_chunk: bool):
     # Handle parameters
-    max_workers, instance_ids, patch_files = handle_parameters(
-        mode, disable_cache, max_workers
+    max_workers, instance_ids, patch_files, enable_chunk = handle_parameters(
+        mode, disable_cache, max_workers, enable_chunk
     )
 
     # Handle cache
@@ -50,22 +50,23 @@ def main(mode: int, disable_cache: int, max_workers: int):
     print()
 
     n = len(instances)
-    for i in range(0, n, max_workers):
+    chunk_size = max_workers if enable_chunk else n
+    for i in range(0, n, chunk_size):
         print("=" * 50)
-        upper_bound = min(i + max_workers, n)
-        if max_workers > 1 and (upper_bound != i + 1):
+        upper_bound = min(i + chunk_size, n)
+        if chunk_size > 1 and (upper_bound != i + 1):
             print(
-                f"  🔥 Running evaluation for instances {i+1} to {min(i + max_workers, n)}"
+                f"  🔥 Running evaluation for instances {i+1} to {min(i + chunk_size, n)}"
             )
         else:
             print(f"  🔥 Running evaluation instance {i+1}")
         print("=" * 50 + "\n")
 
-        instance_ids_batch = filtered_instance_ids[i : i + max_workers]
-        patch_files_batch = filtered_patch_files[i : i + max_workers]
-        instances_batch = instances[i : i + max_workers]
+        instance_ids_batch = filtered_instance_ids[i : i + chunk_size]
+        patch_files_batch = filtered_patch_files[i : i + chunk_size]
+        instances_batch = instances[i : i + chunk_size]
 
-        batch_index = i // max_workers
+        batch_index = i // chunk_size
         predictions_path = write_predictions(
             instance_ids_batch, patch_files_batch, timestamp, batch_index, temp=True
         )
@@ -109,7 +110,7 @@ def main(mode: int, disable_cache: int, max_workers: int):
     print()
     print("=" * 50)
     print(" " * 12, "🎉 Evaluation completed 🎉")
-    print(f"📃 Report: gru-result/evalution/{timestamp}/report.json")
+    print(f"📃 Report: gru-result/evaluation/{timestamp}/report.json")
     print("=" * 50)
 
     print(f"Total instances: {report_data.get('total_instances', 0)}")
@@ -137,6 +138,12 @@ if __name__ == "__main__":
         type=int,
         default=0,
         help="Dataset name: SWE-bench or SWE-bench_Lite",
+    )
+    parser.add_argument(
+        "--enable-chunk",
+        type=bool,
+        default=False,
+        help="Disable chunking the evaluation into smaller batches",
     )
     args = parser.parse_args()
     main(**vars(args))

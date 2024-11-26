@@ -40,4 +40,4 @@ class ReportInsatnce(TypedDict):
 
 
 SWE_BENCH_DATASET_PATH = Path("gru/dataset/swe-bench")
-SWE_BENCH_RESULT_PATH = Path("gru-result/evalution")
+SWE_BENCH_RESULT_PATH = Path("gru-result/evaluation")

@@ -15,7 +15,7 @@ from .constants import (
 
 # =============== Handling the parameters ===============
 def handle_parameters(
-    mode: int, disable_cache: int, max_workers: int
+    mode: int, disable_cache: int, max_workers: int, enable_chunk: bool
 ) -> tuple[int, int, int, str, list[str], list[str]]:
     if disable_cache < 0 or disable_cache > 2:
         raise ValueError("Invalid disable_cache value")
@@ -30,6 +30,7 @@ def handle_parameters(
     print(
         f"🎯 Max workers{' (auto mode)' if max_workers == 0 else ''}: ",
         refreshed_max_workers,
+        f" [chunk {'enabled' if enable_chunk else 'disabled'}]",
         "\n",
         sep="",
     )
@@ -53,7 +54,7 @@ def handle_parameters(
         case _:
             raise ValueError("Invalid mode")
 
-    return refreshed_max_workers, instance_ids, patch_files
+    return refreshed_max_workers, instance_ids, patch_files, enable_chunk
 
 
 # ================= Data Preprocessing =================
@@ -272,7 +273,7 @@ def combine_reports(
 
 
 def update_report(timestamp: str):
-    foler_path = Path("gru-result/evalution") / timestamp
+    foler_path = Path("gru-result/evaluation") / timestamp
     report_path = foler_path / "report.json"
 
     if report_path.exists():
