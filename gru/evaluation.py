@@ -50,7 +50,7 @@ def main(mode: int, disable_cache: int, max_workers: int, enable_chunk: bool):
     print()
 
     n = len(instances)
-    chunk_size = max_workers if enable_chunk else n
+    chunk_size = max_workers if enable_chunk else min(n, 1)
     for i in range(0, n, chunk_size):
         print("=" * 50)
         upper_bound = min(i + chunk_size, n)
