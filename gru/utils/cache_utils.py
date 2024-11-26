@@ -7,7 +7,7 @@ import hashlib
 from gru.utils.constants import ReportInsatnce
 
 CACHE_FOLDER = Path("gru/dataset/cache")
-RESULTS_FOLDER = Path("gru-result/evalution")
+RESULTS_FOLDER = Path("gru-result/evaluation")
 
 
 class InstanceCache(TypedDict):
