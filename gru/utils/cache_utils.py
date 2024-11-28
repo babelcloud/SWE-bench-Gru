@@ -84,7 +84,7 @@ class CacheManager:
                 self.load_cached_log(timestamp, [cache[-1]])
 
         if count == 0:
-            print("No cached instances found.\n")
+            print("\tNo cached instances found.\n")
 
         print("=" * 50)
 
