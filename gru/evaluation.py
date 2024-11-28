@@ -50,16 +50,19 @@ def main(mode: int, disable_cache: int, max_workers: int, enable_chunk: bool):
     print()
 
     n = len(instances)
+    if n == 0:
+        print("\tNo instances to evaluate")
+
     chunk_size = max_workers if enable_chunk else max(n, 1)
     for i in range(0, n, chunk_size):
         print("=" * 50)
         upper_bound = min(i + chunk_size, n)
         if chunk_size > 1 and (upper_bound != i + 1):
             print(
-                f"  🔥 Running evaluation for instances {i+1} to {min(i + chunk_size, n)}"
+                f"    🔥 Running evaluation for instances {i+1} to {min(i + chunk_size, n)}"
             )
         else:
-            print(f"  🔥 Running evaluation instance {i+1}")
+            print(f"\t🔥 Running evaluation instance {i+1}")
         print("=" * 50 + "\n")
 
         instance_ids_batch = filtered_instance_ids[i : i + chunk_size]

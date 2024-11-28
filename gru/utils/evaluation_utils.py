@@ -143,7 +143,7 @@ def write_predictions(
         print(f"Error: {e}")
 
 
-def read_patch(patchFile: str) -> str:
+def read_patch(patchFile: str) -> str | None:
     # patchFile is a link of patch file
     try:
         if Path(patchFile).exists():
@@ -167,7 +167,7 @@ def preprocess_data(
     new_patch_files = []
     for ins, patch in zip(instance_ids, patchFileList):
         patch_file = read_patch(patch)
-        if patch_file is None:
+        if patch_file is None or len(patch_file) == 0:
             print(f"Error fetching the patch file for {ins}, skipping...")
             continue
         new_instance_ids.append(ins)
@@ -189,7 +189,7 @@ def parse_json(file_path: str) -> tuple[list[str], list[str]]:
         instance_ids = []
         patch_files = []
         for instance in json_file:
-            if instance.get("patch") is None:
+            if instance.get("patch") is None or len(instance["patch"]) == 0:
                 continue
             instance_ids.append(instance["instance_id"])
             patch_files.append(instance["patch"])
