@@ -2,6 +2,8 @@
 
 This repository contains a helper script to evaluate model predictions on the SWE-bench dataset.
 
+Using `ssh ubuntu@35.212.134.229` to connect to the evaluation server.
+
 # Usage
 
 ## Setup the environment

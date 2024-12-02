@@ -92,7 +92,7 @@ class CacheManager:
 
     def load_cached_log(self, timestamp: str, cache: list[InstanceCache]):
         for instance_record in cache:
-            trget_folder = (
+            target_folder = (
                 RESULTS_FOLDER / timestamp / "log" / instance_record["instance_id"]
             )
             source_folder = (
@@ -102,7 +102,7 @@ class CacheManager:
                 / instance_record["instance_id"]
             )
             # copy all contents from source_folder to target_folder
-            shutil.copytree(source_folder, trget_folder)
+            shutil.copytree(source_folder, target_folder, symlinks=True)
 
     def save_instance_result(
         self,
