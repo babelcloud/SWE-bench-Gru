@@ -20,10 +20,10 @@ DATASET_NAME = "SWE-bench"  # "SWE-bench_Lite"
 
 
 # ================= Main Functions =================
-def main(mode: int, disable_cache: int, max_workers: int, enable_chunk: bool):
+def main(mode: int, disable_cache: int, max_workers: int, enable_chunk: bool, limit: int, ignore: str):
     # Handle parameters
     max_workers, instance_ids, patch_files, enable_chunk = handle_parameters(
-        mode, disable_cache, max_workers, enable_chunk
+        mode, disable_cache, max_workers, enable_chunk, limit, ignore
     )
 
     # Handle cache
@@ -147,6 +147,18 @@ if __name__ == "__main__":
         type=bool,
         default=False,
         help="Disable chunking the evaluation into smaller batches",
+    )
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=-1,
+        help="Limit the number of instances to evaluate",
+    ),
+    parser.add_argument(
+        "--ignore",
+        type=str,
+        default="",
+        help="Ignore instances (comma-separated)",
     )
     args = parser.parse_args()
     main(**vars(args))

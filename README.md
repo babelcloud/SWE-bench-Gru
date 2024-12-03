@@ -24,23 +24,42 @@ Using `ssh ubuntu@35.212.134.229` to connect to the evaluation server.
 
 ## Run following command to start the evaluation script
 
-### mode 0 (default)
+| Parameter         | Value                                                                                          |
+| ----------------- | ---------------------------------------------------------------------------------------------- |
+| `--mode`          | `0`(default): input from file, `1`: input manuall                                              |
+| `--disable-cache` | `0`(default): enable cache, `1`: disable cache, `2`: disable unsolved instances cache          |
+| `--max-workers`   | `0`(default): auto mode (3/4 of available cpu), `1`: single worker, `k(k>0)`: k workers        |
+| `--enable-chunk`  | `false`(default): disable chunk mode, `true`: enable chunk mode                                |
+| `--limit`         | `-1`(default): no limit, `k(k>0)`: limit the number of instances to evaluate                   |
+| `--ignore`        | `""`(default): do nothing, `instance_id1,instance_id2,...`: ignore instances (comma-separated) |
 
-Input the path (or url) of the combined patch file and the instance id to evaluate the model prediction.
+Example
 
 ```bash
-  python -m gru.evaluation
+python -m gru.evaluation --mode 1 --disable-cache 1 --max-workers 5 --enable-chunk true --limit 20 --ignore "astropy__astropy-14365,astropy__astropy-14995"
 ```
 
-### mode 1
+## Detailed Explanation for Each Parameter
 
-Input instance ids and patch file links manually according to instructions.
+### `--mode`
 
-```bash
-  python -m gru.evaluation --mode 1
-```
+-   `--mode 0` (default)
 
-## Disable the Cache
+    Input the path (or url) of the combined patch file and the instance id to evaluate the model prediction.
+
+    ```bash
+      python -m gru.evaluation
+    ```
+
+-   `--mode 1`
+
+    Input instance ids and patch file links manually according to instructions.
+
+    ```bash
+      python -m gru.evaluation --mode 1
+    ```
+
+### `--disable-cache`
 
 If you want to disable the cache, you can set the `--disable-cache` flag.
 
@@ -52,12 +71,11 @@ If you want to disable the cache, you can set the `--disable-cache` flag.
 
 ```bash
   python -m gru.evaluation --disable-cache 1
-
   # or
   python -m gru.evaluation --mode 1 --disable-cache 2
 ```
 
-## Modify Max Workers
+### `--max-workers`
 
 You can modify the number of workers by setting the `--max-workers` flag, default is 0 (auto mode).
 
@@ -71,7 +89,7 @@ You can modify the number of workers by setting the `--max-workers` flag, defaul
   python -m gru.evaluation --max-workers 2
 ```
 
-## Enable Chunk Mode
+### `--enable-chunk`
 
 You can enable the chunk mode by setting the `--enable-chunk` flag, default is False (disable).
 

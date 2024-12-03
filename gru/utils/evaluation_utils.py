@@ -15,7 +15,12 @@ from .constants import (
 
 # =============== Handling the parameters ===============
 def handle_parameters(
-    mode: int, disable_cache: int, max_workers: int, enable_chunk: bool
+    mode: int,
+    disable_cache: int,
+    max_workers: int,
+    enable_chunk: bool,
+    limit: int,
+    ignore: str,
 ) -> tuple[int, int, int, str, list[str], list[str]]:
     if disable_cache < 0 or disable_cache > 2:
         raise ValueError("Invalid disable_cache value")
@@ -28,21 +33,45 @@ def handle_parameters(
     else:
         refreshed_max_workers = max_workers
     print(
-        f"🎯 Max workers{' (auto mode)' if max_workers == 0 else ''}: ",
+        f"🎯 Max workers{' (auto mode)' if max_workers == 0 else ''}:",
         refreshed_max_workers,
-        f" [chunk {'enabled' if enable_chunk else 'disabled'}]",
-        "\n",
-        sep="",
     )
+    print(f"📦 Chunk: {'enabled' if enable_chunk else 'disabled'}")
+    print(f"📌 Limit: {limit if limit > 0 else 'all'}")
+
+    ignore_instances = [
+        instance_id.strip()
+        for instance_id in ignore.strip().split(",")
+        if len(instance_id.strip()) > 0
+    ]
+    ignore_instances = sorted(list(set(ignore_instances)))  # remove repeated instances
+
+    print(f"🔪 Ignoring instances: ", end="")
+    if len(ignore_instances) > 0:
+        print()
+        max_len = max([len(ins) for ins in ignore_instances])
+        # print 3 instance on each line
+        for i in range(0, len(ignore_instances), 4):
+            instances_to_print = ignore_instances[i : i + 4]
+            print(
+                "\t",
+                " ".join([f"{ins + ",":<{max_len}}" for ins in instances_to_print]),
+                sep="",
+            )
+    else:
+        print("\tNone")
+    print()
 
     # ================= Handle patch input =================
     match mode:
         case 0:
             file_path = input("Enter the path of the json file (url or local path): \n")
-            instance_ids, patch_files = parse_json(file_path)
+            instance_ids, patch_files = parse_json(file_path, ignore_instances)
         case 1:
             # get instance ids for input, separated by space
             instance_ids = input("Enter instance ids separated by space: \n").split()
+            # remove ignored instances
+            instance_ids = [ins for ins in instance_ids if ins not in ignore_instances]
             print()
             # get patch file names for input, separated by comma12
             patch_files = []
@@ -53,6 +82,11 @@ def handle_parameters(
             instance_ids, patch_files = preprocess_data(instance_ids, patch_files)
         case _:
             raise ValueError("Invalid mode")
+
+    # ================= Handle limit =================
+    if limit > 0:
+        instance_ids = instance_ids[:limit]
+        patch_files = patch_files[:limit]
 
     return refreshed_max_workers, instance_ids, patch_files, enable_chunk
 
@@ -176,7 +210,9 @@ def preprocess_data(
     return new_instance_ids, new_patch_files
 
 
-def parse_json(file_path: str) -> tuple[list[str], list[str]]:
+def parse_json(
+    file_path: str, ignore_instances: list[str]
+) -> tuple[list[str], list[str]]:
     try:
         if Path(file_path).exists():
             with open(file_path, "r") as f:
@@ -190,6 +226,8 @@ def parse_json(file_path: str) -> tuple[list[str], list[str]]:
         patch_files = []
         for instance in json_file:
             if instance.get("patch") is None or len(instance["patch"]) == 0:
+                continue
+            if instance["instance_id"] in ignore_instances:
                 continue
             instance_ids.append(instance["instance_id"])
             patch_files.append(instance["patch"])
